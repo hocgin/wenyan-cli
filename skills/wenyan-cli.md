@@ -214,5 +214,5 @@ wenyan theme --list
 
 ## 相关资源
 
-- GitHub: https://github.com/your-org/wenyan-cli
+- GitHub: https://github.com/hocgin/wenyan-cli
 - 文档: https://docs.wenyan-cli.com

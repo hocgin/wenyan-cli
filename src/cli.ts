@@ -139,7 +139,7 @@ export function createProgram(version: string = pkg.version): Command {
         .option("--aspect-ratio <aspectRatio>", "图片比例，例如: 16:9", "16:9")
         .action(async (options: any) => {
             try {
-                console.log("options", options);
+                // console.log("options", options);
                 const { Ext } = await import("./ext/index.js");
                 await Ext.runImage(options)
             } catch (error: any) {
