@@ -13,7 +13,6 @@ import {
     ThemeOptions,
 } from "@hocgin/wenyan-core/wrapper";
 import { getInputContent } from "./utils.js";
-import {Ext} from "./ext/index.js";
 
 export function createProgram(version: string = pkg.version): Command {
     const program = new Command();
