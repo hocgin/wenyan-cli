@@ -115,11 +115,9 @@ export class Ext {
             // 任务成功
             if (result.status === 'succeed') {
                 // 下载并保存文件到本地
-                for (const item of result.data) {
-                    // const filename = path.basename(new URL(item.url).pathname);
-                    const filepath = toPath;
-                    await Ext.downloadFile(item.url, filepath);
-                }
+                let item = result.data[0];
+                const filepath = toPath;
+                await Ext.downloadFile(item.url, filepath);
                 return result;
             }
 
