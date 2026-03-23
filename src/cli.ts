@@ -34,6 +34,8 @@ export function createProgram(version: string = pkg.version): Command {
             .option("-h, --highlight <highlight-theme-id>", "ID of the code highlight theme to use", "solarized-light")
             .option("-c, --custom-theme <path>", "path to custom theme CSS file")
             .option("--mac-style", "display codeblock with mac style", true)
+            .option("--appid", "微信公众号的 appid")
+            .option("--appsecret", "微信公众号的 appsecret")
             .option("--no-mac-style", "disable mac style")
             .option("--footnote", "convert link to footnote", true)
             .option("--no-footnote", "disable footnote");
@@ -145,6 +147,22 @@ export function createProgram(version: string = pkg.version): Command {
                 process.exit(1);
             }
         })
+
+    program.command("submit")
+        .description("发布草稿文章")
+        .option("--appid <appid>", "微信公众号的 appid")
+        .option("--appsecret <appsecret>", "微信公众号的 appsecret")
+        .option("--mediaid <mediaid>", "微信公众号的 media_id")
+        .action(async (options: { appid: string; appsecret: string, mediaid: string }) => {
+            try {
+                const { Ext } = await import("./ext/index.js");
+                await Ext.runSubmit(options)
+            } catch (error: any) {
+                console.error(error.message);
+                process.exit(1);
+            }
+        })
+
 
     return program;
 }

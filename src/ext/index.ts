@@ -1,13 +1,19 @@
 import * as fs from 'fs';
 import * as path from 'path';
 
-interface QiniuOptions {
+interface AIImageOptions {
     model: string;
     token: string;
     toPath: string;
     prompt: string;
     timeout: number;
     aspectRatio: string;
+}
+
+interface SubmitOptions {
+    appid: string;
+    appsecret: string;
+    mediaid: string;
 }
 
 interface TaskResult {
@@ -23,14 +29,20 @@ interface TaskResult {
 }
 
 export class Ext {
-    public static async runImage(options: QiniuOptions) {
+    public static async runImage(options: AIImageOptions) {
         switch (options.model) {
             case 'qiniu':
                 return await this.qiniu(options);
         }
     }
 
-    public static async qiniu(options: QiniuOptions) {
+    /// 发布草稿
+    /// api 文档: https://developers.weixin.qq.com/doc/subscription/api/public/api_freepublish_submit.html
+    public static async runSubmit(options: SubmitOptions) {
+
+    }
+
+    public static async qiniu(options: AIImageOptions) {
         let token = options.token;
         let timeout = options.timeout;
         let toPath = options.toPath;
@@ -112,7 +124,7 @@ export class Ext {
                 for (const item of result.data) {
                     const filename = path.basename(new URL(item.url).pathname);
                     const filepath = path.join(toPath, filename);
-                    await downloadFile(item.url, filepath);
+                    await Ext.downloadFile(item.url, filepath);
                 }
                 return result;
             }
@@ -128,7 +140,7 @@ export class Ext {
     }
 
     /// 下载文件到本地
-    static async downloadFile(url: string, filepath: string): Promise<void> {
+   public static async downloadFile(url: string, filepath: string): Promise<void> {
         const response = await fetch(url);
         if (!response.ok) {
             throw new Error(`下载文件失败: ${response.statusText}`);
