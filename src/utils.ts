@@ -1,6 +1,6 @@
 import path from "node:path";
 import fs from "node:fs/promises";
-import { getNormalizeFilePath } from "@wenyan-md/core/wrapper";
+import { getNormalizeFilePath } from "@hocgin/wenyan-core/wrapper";
 
 export async function readStdin(): Promise<string> {
     return new Promise<string>((resolve, reject) => {

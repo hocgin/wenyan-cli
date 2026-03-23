@@ -2,9 +2,8 @@ import express, { Request, Response, NextFunction } from "express";
 import fs from "node:fs/promises";
 import path from "node:path";
 import crypto from "node:crypto";
-import { configDir } from "@wenyan-md/core/wrapper";
+import { configDir, publishToWechatDraft } from "@hocgin/wenyan-core/wrapper";
 import multer from "multer";
-import { publishToWechatDraft } from "@wenyan-md/core/publish";
 
 export interface ServeOptions {
     port?: number;

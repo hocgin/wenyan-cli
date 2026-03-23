@@ -9,9 +9,9 @@ import {
     removeTheme,
     renderAndPublish,
     renderAndPublishToServer,
-    RenderOptions,
+    RenderOptions, submit,
     ThemeOptions,
-} from "@wenyan-md/core/wrapper";
+} from "@hocgin/wenyan-core/wrapper";
 import { getInputContent } from "./utils.js";
 import {Ext} from "./ext/index.js";
 
@@ -34,8 +34,8 @@ export function createProgram(version: string = pkg.version): Command {
             .option("-h, --highlight <highlight-theme-id>", "ID of the code highlight theme to use", "solarized-light")
             .option("-c, --custom-theme <path>", "path to custom theme CSS file")
             .option("--mac-style", "display codeblock with mac style", true)
-            .option("--appid", "微信公众号的 appid")
-            .option("--appsecret", "微信公众号的 appsecret")
+            .option("--appId", "微信公众号的 appId")
+            .option("--appSecret", "微信公众号的 appSecret")
             .option("--no-mac-style", "disable mac style")
             .option("--footnote", "convert link to footnote", true)
             .option("--no-footnote", "disable footnote");
@@ -134,12 +134,13 @@ export function createProgram(version: string = pkg.version): Command {
         .option("-s, --service <service>", "服务提供商, 例如: qiniu", "qiniu")
         .option("-m, --model <model>", "模型名称, 例如: kling-v1-5", "kling-v1-5")
         .option("--token <token>", "服务提供商 Token", "")
-        .option("--to-path <toPath>", "图片保存位置", "./out.png")
+        .option("--path <path>", "图片保存位置", "./out.png")
         .option("--prompt <prompt>", "提示词", "生成一只小猫")
-        .option("--timeout <timeout>", "超时时间(秒)", "10")
+        .option("--timeout <timeout>", "超时时间(秒)", "30")
         .option("--aspect-ratio <aspectRatio>", "图片比例，例如: 16:9", "16:9")
-        .action(async (options: { model: string; token: string, toPath: string, prompt: string, timeout: number, aspectRatio: string }) => {
+        .action(async (options: any) => {
             try {
+                console.log("options", options);
                 const { Ext } = await import("./ext/index.js");
                 await Ext.runImage(options)
             } catch (error: any) {
@@ -150,19 +151,18 @@ export function createProgram(version: string = pkg.version): Command {
 
     program.command("submit")
         .description("发布草稿文章")
-        .option("--appid <appid>", "微信公众号的 appid")
-        .option("--appsecret <appsecret>", "微信公众号的 appsecret")
-        .option("--mediaid <mediaid>", "微信公众号的 media_id")
-        .action(async (options: { appid: string; appsecret: string, mediaid: string }) => {
+        .option("--appId", "微信公众号的 appId")
+        .option("--appSecret", "微信公众号的 appSecret")
+        .option("--mediaId <mediaId>", "微信公众号的 media_id")
+        .action(async (options: { appId: string; appSecret: string, mediaId: string }) => {
             try {
-                const { Ext } = await import("./ext/index.js");
-                await Ext.runSubmit(options)
+                const { publish_id } = await submit({ media_id: options.mediaId }, options as any);
+                console.log(`发布成功，Publish ID: ${publish_id}`);
             } catch (error: any) {
                 console.error(error.message);
                 process.exit(1);
             }
         })
-
 
     return program;
 }

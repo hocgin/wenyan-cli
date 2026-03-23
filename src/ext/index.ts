@@ -2,18 +2,13 @@ import * as fs from 'fs';
 import * as path from 'path';
 
 interface AIImageOptions {
+    service: string;
     model: string;
     token: string;
-    toPath: string;
+    path: string;
     prompt: string;
     timeout: number;
     aspectRatio: string;
-}
-
-interface SubmitOptions {
-    appid: string;
-    appsecret: string;
-    mediaid: string;
 }
 
 interface TaskResult {
@@ -30,22 +25,18 @@ interface TaskResult {
 
 export class Ext {
     public static async runImage(options: AIImageOptions) {
-        switch (options.model) {
+        switch (options.service) {
             case 'qiniu':
                 return await this.qiniu(options);
+            default:
+                console.log(`Ext ${options.service} not found`);
         }
-    }
-
-    /// 发布草稿
-    /// api 文档: https://developers.weixin.qq.com/doc/subscription/api/public/api_freepublish_submit.html
-    public static async runSubmit(options: SubmitOptions) {
-
     }
 
     public static async qiniu(options: AIImageOptions) {
         let token = options.token;
-        let timeout = options.timeout;
-        let toPath = options.toPath;
+        let timeout = options.timeout * 1000;
+        let toPath = options.path;
 
         let myHeaders = new Headers();
         myHeaders.append("Authorization", `Bearer ${token}`);
@@ -67,6 +58,7 @@ export class Ext {
         let resp = await fetch("https://api.qnaigc.com/v1/images/generations", requestOptions)
             .then(response => response.json());
         let task_id = resp.task_id
+        console.log("任务ID = " + task_id);
         if (!task_id) {
             throw new Error(resp.error || '创建任务失败')
         }

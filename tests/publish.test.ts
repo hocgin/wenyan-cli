@@ -1,12 +1,12 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { publishCommand } from "../src/commands/publish";
-import { publishToWechatDraft } from "@wenyan-md/core/publish";
+import { publishToWechatDraft } from "@hocgin/wenyan-core/wrapper";
 import { prepareRenderContext } from "../src/commands/render";
 import { join } from "node:path";
 import { readFileSync } from "node:fs";
 
 // 1. Mock 依赖模块
-vi.mock("@wenyan-md/core/publish");
+vi.mock("@hocgin/wenyan-core/wrapper");
 vi.mock("../src/commands/render"); // 关键：Mock 内部的 render 准备逻辑
 
 const md = readFileSync(join(process.cwd(), "tests/publish.md"), "utf8");
