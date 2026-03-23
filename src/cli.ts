@@ -13,6 +13,7 @@ import {
     ThemeOptions,
 } from "@wenyan-md/core/wrapper";
 import { getInputContent } from "./utils.js";
+import {Ext} from "./ext/index.js";
 
 export function createProgram(version: string = pkg.version): Command {
     const program = new Command();
@@ -125,6 +126,25 @@ export function createProgram(version: string = pkg.version): Command {
                 process.exit(1);
             }
         });
+
+    program.command("image")
+        .description("AI 生图服务")
+        .option("-s, --service <service>", "服务提供商, 例如: qiniu", "qiniu")
+        .option("-m, --model <model>", "模型名称, 例如: kling-v1-5", "kling-v1-5")
+        .option("--token <token>", "服务提供商 Token", "")
+        .option("--to-path <toPath>", "图片保存位置", "./out.png")
+        .option("--prompt <prompt>", "提示词", "生成一只小猫")
+        .option("--timeout <timeout>", "超时时间(秒)", "10")
+        .option("--aspect-ratio <aspectRatio>", "图片比例，例如: 16:9", "16:9")
+        .action(async (options: { model: string; token: string, toPath: string, prompt: string, timeout: number, aspectRatio: string }) => {
+            try {
+                const { Ext } = await import("./ext/index.js");
+                await Ext.runImage(options)
+            } catch (error: any) {
+                console.error(error.message);
+                process.exit(1);
+            }
+        })
 
     return program;
 }
