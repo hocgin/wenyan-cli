@@ -33,8 +33,8 @@ export function createProgram(version: string = pkg.version): Command {
             .option("-h, --highlight <highlight-theme-id>", "ID of the code highlight theme to use", "solarized-light")
             .option("-c, --custom-theme <path>", "path to custom theme CSS file")
             .option("--mac-style", "display codeblock with mac style", true)
-            .option("--appId", "微信公众号的 appId")
-            .option("--appSecret", "微信公众号的 appSecret")
+            .option("--appId <appId>", "微信公众号的 appId")
+            .option("--appSecret <appSecret>", "微信公众号的 appSecret")
             .option("--no-mac-style", "disable mac style")
             .option("--footnote", "convert link to footnote", true)
             .option("--no-footnote", "disable footnote");
