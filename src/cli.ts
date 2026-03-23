@@ -136,7 +136,7 @@ export function createProgram(version: string = pkg.version): Command {
         .option("--token <token>", "服务提供商 Token", "")
         .option("--path <path>", "图片保存位置", "./out.png")
         .option("--prompt <prompt>", "提示词", "生成一只小猫")
-        .option("--timeout <timeout>", "超时时间(秒)", "30")
+        .option("--timeout <timeout>", "超时时间(秒)", "60")
         .option("--aspect-ratio <aspectRatio>", "图片比例，例如: 16:9", "16:9")
         .action(async (options: any) => {
             try {

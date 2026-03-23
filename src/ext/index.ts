@@ -110,6 +110,7 @@ export class Ext {
             // 查询任务状态
             const result: TaskResult = await queryTask(task_id);
 
+            console.log('result.status = ', result.status)
             // 任务成功
             if (result.status === 'succeed') {
                 // 下载并保存文件到本地
