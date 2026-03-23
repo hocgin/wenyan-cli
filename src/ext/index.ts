@@ -71,7 +71,8 @@ export class Ext {
             let requestOptions = {
                 method: 'GET',
                 headers: myHeaders,
-                redirect: 'follow'
+                redirect: 'follow',
+                cache: "no-store"
             };
 
             /**
@@ -97,7 +98,7 @@ export class Ext {
 
         /// 迭代查询
         const startTime = Date.now();
-        const pollInterval = 2000; // 每2秒查询一次
+        const pollInterval = 5000; // 每2秒查询一次
 
 
         while (true) {
