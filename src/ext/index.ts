@@ -116,8 +116,8 @@ export class Ext {
             if (result.status === 'succeed') {
                 // 下载并保存文件到本地
                 for (const item of result.data) {
-                    const filename = path.basename(new URL(item.url).pathname);
-                    const filepath = path.join(toPath, filename);
+                    // const filename = path.basename(new URL(item.url).pathname);
+                    const filepath = toPath;
                     await Ext.downloadFile(item.url, filepath);
                 }
                 return result;
