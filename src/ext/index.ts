@@ -58,7 +58,7 @@ export class Ext {
         let resp = await fetch("https://api.qnaigc.com/v1/images/generations", requestOptions)
             .then(response => response.json());
         let task_id = resp.task_id
-        console.log("任务ID = " + task_id);
+        console.log("taskID = " + task_id);
         if (!task_id) {
             throw new Error(resp.error || '创建任务失败')
         }
@@ -110,7 +110,7 @@ export class Ext {
             // 查询任务状态
             const result: TaskResult = await queryTask(task_id);
 
-            console.log('result.status = ', result.status)
+            console.log(`task.id = ${task_id}, task.status = `, result.status)
             // 任务成功
             if (result.status === 'succeed') {
                 // 下载并保存文件到本地
