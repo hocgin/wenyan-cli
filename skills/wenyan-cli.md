@@ -192,6 +192,33 @@ wenyan publish -f article.md --appId your_app_id --appSecret your_secret
 - 需要 server URL 和 api-key
 - 适合团队协作和部署
 
+## Frontmatter 要求
+
+必须在 Markdown 顶部包含一段 frontmatter：
+
+```
+---
+title: 文章标题
+cover: ./cover.jpg
+author: 作者名称
+source_url: https://example.com
+---
+```
+
+字段说明：
+
+| 字段         | 必填 | 说明                |
+| ---------- | -- | ----------------- |
+| title      | 是  | 文章标题              |
+| cover      | 否  | 封面图片（本地路径或网络 URL） |
+| author     | 否  | 作者                |
+| source_url | 否  | 原文链接              |
+
+说明：
+
+* 如果未指定 cover，将自动使用正文第一张图片作为封面
+* cover 支持本地路径和网络 URL
+
 ## 错误处理
 
 所有命令都包含统一的错误处理：
