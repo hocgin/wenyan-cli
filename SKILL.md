@@ -1,135 +1,86 @@
-# wenyan-cli 发布指南
+# Wenyan CLI 服务器模式技能
 
-## 准备工作
+这个技能主要用于 Wenyan CLI 的**服务器模式**，重点覆盖：
 
-你需要准备一篇 Markdown 格式的文章，包含必要的 frontmatter（标题、封面等元数据）。如果文章内包含图片，确保图片路径正确且可访问，CLI 会自动上传图片到微信公众号素材库。
+- 启动 `wenyan serve`
+- 使用 `wenyan publish --server ...` 连接远程服务
+- `publish` 本地模式下使用 `--appId` / `--appSecret`
+- 配置 API Key 认证
+- 部署在固定 IP / 云服务器 / CI 场景下的发布流程
 
-## 安装 wenyan-cli
+## 先看结论
 
-```bash
-npm install -g @wenyan-md/cli
-```
+如果你的机器没有固定公网 IP，或者需要统一管理多个公众号，优先使用服务器模式；如果是本地直连公众号 API，则给 `publish` 传 `--appId` 和 `--appSecret`：
 
-确认安装成功：
+1. 在云服务器上启动 Wenyan Server
+2. 客户端通过 `--server` 和 `--api-key` 远程发布
+3. 本地模式下，`publish` 直接携带 `--appId` 和 `--appSecret`
 
-```bash
-wenyan --version
-```
-
-## 发布文章
-
-发布文章的基本命令如下：
+## 服务端启动
 
 ```bash
-wenyan publish [options]
+pnpm add -g @wenyan-md/cli
+wenyan serve --port 3000 --api-key your-secret-key
 ```
 
-### 命令参数说明
+常用参数：
 
-| 参数             | 简写 | 说明                 | 必填 | 默认值             |
-| -------------- | -- | ------------------ | -- | --------------- |
-| --file         | -f | Markdown 文件路径      | 否¹ | -               |
-| --theme        | -t | 排版主题               | 否  | default         |
-| --highlight    | -h | 代码高亮主题             | 否  | solarized-light |
-| --custom-theme | -c | 自定义主题 CSS（本地或 URL） | 否  | -               |
-| --no-mac-style | -  | 禁用代码块 Mac 风格       | 否  | 启用              |
-| --no-footnote  | -  | 禁用脚注转换             | 否  | 启用              |
-| --server       | -  | Wenyan Server 地址   | 否  | -               |
-| --api-key      | -  | Server API Key     | 否² | -               |
-| --help         | -  | 查看帮助               | 否  | -               |
+| 参数 | 说明 | 默认值 |
+| --- | --- | --- |
+| `--port` / `-p` | 服务端口 | `3000` |
+| `--api-key` | 服务端认证密钥 | - |
 
-### 从本地文件读取并发布
+## 客户端发布
 
 ```bash
-wenyan publish -f article.md
+wenyan publish -f article.md \
+  --server https://api.example.com \
+  --api-key your-secret-key
 ```
 
-### 指定排版主题
+本地直连公众号 API 时，也可以直接传参：
 
 ```bash
-wenyan publish -f article.md -t orangeheart
+wenyan publish -f article.md \
+  --appId your_app_id \
+  --appSecret your_app_secret
 ```
-
-### 指定代码高亮主题
-
-```bash
-wenyan publish -f article.md -h solarized-light
-```
-
-## 主题管理
-
-主题管理的基本命令如下：
-
-```bash
-wenyan theme [options]
-```
-
-### 命令参数说明
-| 参数              | 简写 | 说明                                                                 | 必填 | 默认值       |
-|-------------------|------|----------------------------------------------------------------------|------|--------------|
-| --list            | -l   | 列出所有可用主题（内置 + 自定义）                  | 否  | -            |
-| --add            | -   | 触发添加自定义主题操作                   | 否（添加主题时必填）  | -            |
-| --name            | -   | 自定义主题名称（唯一标识）                  | 是（仅 `--add` 生效时）  | -            |
-| --path            | -   | 主题 CSS 文件路径（本地绝对 / 相对路径、网络 URL）                   |  是（仅 `--add` 生效时）  | -            |
-| --rm            | -   | 删除指定名称的自定义主题                  | 否（删除主题时必填）  | -            |
-
-
-###  列出可使用的主题
-
-```bash
-wenyan theme -l
-```
-
-## Frontmatter 要求
-
-必须在 Markdown 顶部包含一段 frontmatter：
-
-```
----
-title: 文章标题
-cover: ./cover.jpg
-author: 作者名称
-source_url: https://example.com
----
-```
-
-字段说明：
-
-| 字段         | 必填 | 说明                |
-| ---------- | -- | ----------------- |
-| title      | 是  | 文章标题              |
-| cover      | 否  | 封面图片（本地路径或网络 URL） |
-| author     | 否  | 作者                |
-| source_url | 否  | 原文链接              |
 
 说明：
 
-* 如果未指定 cover，将自动使用正文第一张图片作为封面
-* cover 支持本地路径和网络 URL
+- `--server` 指向 Wenyan Server 地址
+- `--api-key` 必须与服务端一致
+- `--appId` / `--appSecret` 适用于本地直连公众号 API
+- 客户端负责读取 Markdown、上传文件并发起发布请求
 
-## 常见问题
+## 服务端接口
 
-### 图片上传失败
+Server 模式会暴露以下接口：
 
-请检查：
+- `GET /health`：健康检查
+- `GET /verify`：鉴权探针
+- `POST /upload`：上传 Markdown、图片或主题文件
+- `POST /publish`：触发远程发布
 
-* 图片路径是否正确
-* 图片文件是否存在
-* 图片格式是否支持（jpg、png、gif）
+## 适用场景
 
-### 发布失败：invalid ip
+- 需要绕过微信公众号 IP 白名单
+- 需要多公众号统一管理
+- 需要 CI/CD 自动发布
+- 需要 AI Agent 自动发文
 
-说明当前机器 IP 未加入微信公众号白名单。
+## 关键环境变量
 
-解决方法：
-
-登录微信公众号后台，将当前 IP 加入微信公众号白名单。
-
-### 发布失败：invalid appid or secret
-
-请在环境变量中设置以下变量：
+服务端建议配置：
 
 ```bash
-WECHAT_APP_ID
-WECHAT_APP_SECRET
+export WECHAT_APP_ID=xxx
+export WECHAT_APP_SECRET=xxx
 ```
+
+如果只管理一个公众号，也可以把凭据放在服务端运行环境里，减少客户端参数传递。
+
+## 参考文档
+
+- [Server 模式文档](docs/server.md)
+- [发布命令文档](docs/publish.md)

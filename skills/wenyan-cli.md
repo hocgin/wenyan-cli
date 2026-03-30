@@ -1,114 +1,44 @@
 # WenYan CLI
 
-微信公众号 Markdown 渲染和发布工具，支持将 Markdown 文档转换为样式化的 HTML 并直接发布到微信公众号。
+WenYan CLI 是一个 Markdown 渲染和发布工具。这个技能以**服务器模式**为主，帮助你搭建远程发布链路，适合固定 IP、团队协作和自动化发文场景。
 
-## 主要功能
+## 这个技能主要解决什么
 
-- **渲染**：将 Markdown 转换为微信公众号兼容的 HTML
-- **发布**：直接发布到微信公众号（本地模式或服务器模式）
-- **主题**：管理内置和自定义主题
-- **服务**：启动 HTTP API 服务器
-- **AI 生图**：集成 AI 生图服务（如七牛云）
-- **草稿发布**：发布已有的草稿文章
+- 本地机器没有固定公网 IP
+- 需要统一管理多个公众号
+- 需要 CI/CD 或 AI Agent 自动发布
+- 需要把微信公众号 API 调用集中放到服务端
 
-## 安装
+## 核心命令
+
+### 1. 启动服务器
 
 ```bash
-pnpm install -g @hocgin/wenyan-cli
+pnpm add -g @wenyan-md/cli
+wenyan serve --port 3000 --api-key your_secret_key
 ```
 
-## 主要命令
-
-### 1. publish - 渲染并发布
-
-将 Markdown 渲染为 HTML 并发布到微信公众号。
-
-#### 本地模式（直接发布）
+### 2. 通过远程服务器发布
 
 ```bash
-# 从字符串输入发布
-wenyan publish "Hello World" --appId your_app_id --appSecret your_app_secret
-
-# 从文件发布
-wenyan publish -f README.md --appId your_app_id --appSecret your_app_secret
-
-# 从 URL 发布
-wenyan publish -f https://example.com/article.md --appId your_app_id --appSecret your_app_secret
-```
-
-#### 服务器模式（通过远程服务器）
-
-```bash
-# 通过远程服务器发布
 wenyan publish -f article.md \
   --server https://api.yourdomain.com \
-  --api-key your_api_key
+  --api-key your_secret_key
+  --appId your_app_id \
+  --appSecret your_app_secret \
 ```
 
-### 2. render - 仅渲染
+客户端负责读取 Markdown 和图片，服务端负责上传素材并创建草稿。
 
-将 Markdown 渲染为 HTML，不发布。
+### 3. 本地模式直接发布
 
 ```bash
-# 从字符串渲染
-wenyan render "# Hello World"
-
-# 从文件渲染
-wenyan render -f README.md
-
-# 输出到文件
-wenyan render -f README.md > output.html
+wenyan publish -f article.md \
+  --appId your_app_id \
+  --appSecret your_app_secret
 ```
 
-### 3. theme - 主题管理
-
-管理内置和自定义主题。
-
-```bash
-# 列出所有主题
-wenyan theme --list
-
-# 添加自定义主题
-wenyan theme --add --name my-theme --path /path/to/theme.css
-
-# 删除自定义主题
-wenyan theme --rm my-theme
-```
-
-### 4. serve - 启动服务器
-
-启动 HTTP API 服务器提供渲染和发布接口。
-
-```bash
-# 启动服务器（默认端口 3000）
-wenyan serve
-
-# 指定端口
-wenyan serve -p 8080
-
-# 启用 API 认证
-wenyan serve --api-key your_secret_key
-```
-
-### 5. image - AI 生图
-
-使用 AI 服务生成图片。
-
-```bash
-# 使用七牛云生图
-wenyan image \
-  --service qiniu \
-  --model kling-v1-5 \
-  --token your_token \
-  --prompt "一只可爱的小猫" \
-  --path ./output.png \
-  --timeout 180 \
-  --aspect-ratio 16:9
-```
-
-### 6. submit - 发布草稿
-
-发布已有的草稿文章。
+### 4. 发布草稿
 
 ```bash
 wenyan submit \
@@ -117,129 +47,66 @@ wenyan submit \
   --mediaId your_media_id
 ```
 
-## 通用选项
+## 服务器模式说明
 
-适用于 `publish` 和 `render` 命令：
+服务器模式的推荐流程是：
 
-| 选项 | 简写 | 说明 | 默认值 |
-|------|------|------|--------|
-| `--file <path>` | `-f` | 从文件或 URL 读取内容 | - |
-| `--theme <theme-id>` | `-t` | 使用指定主题 | `default` |
-| `--highlight <theme-id>` | `-h` | 代码高亮主题 | `solarized-light` |
-| `--custom-theme <path>` | `-c` | 自定义主题 CSS 文件路径 | - |
-| `--mac-style` | - | 显示 Mac 风格代码块 | `true` |
-| `--no-mac-style` | - | 禁用 Mac 风格代码块 | - |
-| `--footnote` | - | 将链接转换为脚注 | `true` |
-| `--no-footnote` | - | 禁用脚注转换 | - |
+1. 在云服务器上启动 `wenyan serve`
+2. 客户端执行 `wenyan publish --server ... --api-key ...`
+
+## 部署建议
+
+- 使用云服务器或固定 IP 主机
+- 开启 `--api-key` 做基础鉴权
+- 将公众号凭据放在服务端环境变量中
+- 对外只暴露必要端口
+
+## 常见选项
+
+### `serve`
+
+| 选项 | 说明 | 默认值 |
+| --- | --- | --- |
+| `-p, --port <port>` | 监听端口 | `3000` |
+| `--api-key <apiKey>` | 服务端认证密钥 | - |
+
+### `publish`
+
+| 选项 | 说明 | 默认值 |
+| --- | --- | --- |
+| `-f, --file <path>` | 从本地文件或 URL 读取 Markdown | - |
+| `--server <url>` | 远程 Wenyan Server 地址 | - |
+| `--api-key <apiKey>` | 远程服务密钥 | - |
+| `--appId <appId>` | 本地直连公众号 API 的 appId | - |
+| `--appSecret <appSecret>` | 本地直连公众号 API 的 appSecret | - |
+| `-t, --theme <theme-id>` | 排版主题 | `default` |
+| `-h, --highlight <theme-id>` | 代码高亮主题 | `solarized-light` |
+| `-c, --custom-theme <path>` | 自定义主题 CSS | - |
+| `--no-mac-style` | 禁用 Mac 风格代码块 | 启用 |
+| `--no-footnote` | 禁用脚注转换 | 启用 |
 
 ## 使用示例
 
-### 完整发布流程
+### 启动服务器并检查健康状态
 
 ```bash
-# 1. 渲染并发布文章
-wenyan publish -f article.md \
-  --appId wx1234567890abcdef \
-  --appSecret your_secret_key \
-  --theme github \
-  --highlight monokai
-
-# 2. 仅预览渲染结果
-wenyan render -f article.md > preview.html
-
-# 3. 添加自定义主题后发布
-wenyan theme --add --name my-brand --path brand.css
-wenyan publish -f article.md --theme my-brand
+wenyan serve --port 3000 --api-key secret_key
+curl http://localhost:3000/health
 ```
 
-### 服务器模式部署
+### 客户端远程发布
 
 ```bash
-# 1. 启动服务器
-wenyan serve -p 3000 --api-key secret_key
-
-# 2. 客户端通过服务器发布
-wenyan publish -f article.md \
+wenyan publish -f ./article.md \
   --server http://localhost:3000 \
   --api-key secret_key
 ```
 
-### AI 生图集成
 
-```bash
-# 生成文章配图
-wenyan image \
-  --service qiniu \
-  --model kling-v1-5 \
-  --token your_qiniu_token \
-  --prompt "科技感未来城市" \
-  --path ./images/cover.png \
-  --aspect-ratio 16:9
+## 工作模式对比
 
-# 发布文章（可配合使用）
-wenyan publish -f article.md --appId your_app_id --appSecret your_secret
-```
+- 本地模式：直接在本机调用微信公众号 API
+- `publish` 可以直接携带 `--appId` 和 `--appSecret`
+- 服务器模式：客户端只负责提交内容，公众号 API 调用由服务端完成
 
-## 工作模式
-
-### 本地模式
-- 直接在本地调用微信公众号 API
-- 需要 appId 和 appSecret
-- 适合个人使用
-
-### 服务器模式
-- 通过远程服务器进行渲染和发布
-- 需要 server URL 和 api-key
-- 适合团队协作和部署
-
-## Frontmatter 要求
-
-必须在 Markdown 顶部包含一段 frontmatter：
-
-```
----
-title: 文章标题
-cover: ./cover.jpg
-author: 作者名称
-source_url: https://example.com
----
-```
-
-字段说明：
-
-| 字段         | 必填 | 说明                |
-| ---------- | -- | ----------------- |
-| title      | 是  | 文章标题              |
-| cover      | 否  | 封面图片（本地路径或网络 URL） |
-| author     | 否  | 作者                |
-| source_url | 否  | 原文链接              |
-
-说明：
-
-* 如果未指定 cover，将自动使用正文第一张图片作为封面
-* cover 支持本地路径和网络 URL
-
-## 错误处理
-
-所有命令都包含统一的错误处理：
-- 错误信息会以红色显示在 stderr
-- 非 0 退出码表示失败
-- 详细的错误消息帮助快速定位问题
-
-## 常见问题
-
-### 主题列表为空
-```bash
-wenyan theme --list
-```
-
-### 发布失败
-检查 appId 和 appSecret 是否正确，确保网络连接正常。
-
-### 生图超时
-调整 `--timeout` 参数（默认 180 秒）。
-
-## 相关资源
-
-- GitHub: https://github.com/hocgin/wenyan-cli
-- 文档: https://docs.wenyan-cli.com
+如果你主要关心部署和自动化，优先看服务器模式。
