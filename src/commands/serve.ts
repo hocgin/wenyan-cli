@@ -18,6 +18,8 @@ interface RenderRequest {
     customTheme?: string;
     macStyle?: boolean;
     footnote?: boolean;
+    appId?: string;
+    appSecret?: string;
 }
 
 class AppError extends Error {
@@ -144,6 +146,9 @@ export async function serveCommand(options: ServeOptions) {
             cover: gzhContent.cover,
             author: gzhContent.author,
             source_url: gzhContent.source_url,
+        }, {
+            appId: body.appId,
+            appSecret: body.appSecret,
         });
 
         if (data.media_id) {
