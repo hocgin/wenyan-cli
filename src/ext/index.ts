@@ -23,14 +23,61 @@ interface TaskResult {
     quantity: number;
 }
 
+interface JimengResult {
+    created: number;
+    data: Array<{
+        url: string;
+    }>;
+}
+
 export class Ext {
     public static async runImage(options: AIImageOptions) {
         switch (options.service) {
             case 'qiniu':
                 return await this.qiniu(options);
+            case 'jimeng':
+                return await this.jimeng(options);
             default:
                 console.log(`Ext ${options.service} not found`);
         }
+    }
+
+    public static async jimeng(options: AIImageOptions) {
+        const token = options.token;
+        const toPath = options.path;
+
+        const headers = new Headers();
+        headers.append("Authorization", `Bearer ${token}`);
+        headers.append("Content-Type", "application/json");
+
+        // 即梦接口直接返回图片 URL，不需要像旧流程一样轮询任务。
+        const raw = JSON.stringify({
+            model: options.model,
+            prompt: options.prompt,
+            ratio: options.aspectRatio,
+            resolution: "2k"
+        });
+
+        const response = await fetch("http://localhost:5100/v1/images/generations", {
+            method: "POST",
+            headers,
+            body: raw,
+            redirect: "follow",
+        });
+
+        const resp = await response.json() as JimengResult & { error?: string; message?: string };
+        if (!response.ok) {
+            throw new Error(resp.error || resp.message || `请求失败：${response.status} ${response.statusText}`);
+        }
+
+        const firstImage = resp.data?.[0]?.url;
+        if (!firstImage) {
+            throw new Error("创建图片失败：未返回图片地址");
+        }
+
+        // 默认保存第一张结果图，保持和现有命令输出一致。
+        await Ext.downloadFile(firstImage, toPath);
+        return resp;
     }
 
     public static async qiniu(options: AIImageOptions) {
