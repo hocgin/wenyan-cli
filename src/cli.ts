@@ -130,8 +130,8 @@ export function createProgram(version: string = pkg.version): Command {
 
     program.command("image")
         .description("AI 生图服务")
-        .option("-s, --service <service>", "服务提供商, 例如: qiniu", "qiniu")
-        .option("-m, --model <model>", "模型名称, 例如: kling-v1-5", "kling-v1-5")
+        .option("-s, --service <service>", "服务提供商, 例如: qiniu、jimeng", "jimeng")
+        .option("-m, --model <model>", "模型名称, 例如: kling-v1-5、jimeng-4.5", "jimeng-4.5")
         .option("--token <token>", "服务提供商 Token", "")
         .option("--path <path>", "图片保存位置", "./out.png")
         .option("--prompt <prompt>", "提示词", "生成一只小猫")
