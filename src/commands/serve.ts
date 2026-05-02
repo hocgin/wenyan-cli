@@ -146,6 +146,7 @@ export async function serveCommand(options: ServeOptions) {
             cover: gzhContent.cover,
             author: gzhContent.author,
             source_url: gzhContent.source_url,
+            article_type: gzhContent.article_type,
         }, {
             appId: body.appId,
             appSecret: body.appSecret,
