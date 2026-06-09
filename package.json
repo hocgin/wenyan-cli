@@ -1,6 +1,6 @@
 {
   "name": "@hocgin/wenyan-cli",
-  "version": "3.0.9",
+  "version": "3.0.10",
   "description": "A CLI tool for Wenyan markdown rendering & publishing",
   "author": "Lei <caol64@gmail.com> (https://github.com/caol64)",
   "license": "Apache-2.0",
@@ -44,7 +44,7 @@
   },
   "packageManager": "pnpm@10.7.1",
   "dependencies": {
-    "@hocgin/wenyan-core": "^3.0.5",
+    "@hocgin/wenyan-core": "^3.0.6",
     "commander": "^14.0.0",
     "express": "^5.2.1",
     "form-data-encoder": "^4.1.0",
