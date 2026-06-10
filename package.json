@@ -44,7 +44,7 @@
   },
   "packageManager": "pnpm@10.7.1",
   "dependencies": {
-    "@hocgin/wenyan-core": "^3.0.6",
+    "@hocgin/wenyan-core": "^3.0.7",
     "commander": "^14.0.0",
     "express": "^5.2.1",
     "form-data-encoder": "^4.1.0",
